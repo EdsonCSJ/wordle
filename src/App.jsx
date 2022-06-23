@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useCallback } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import words from "./wordle.json";
@@ -47,7 +48,25 @@ const App = () => {
   const [isEnterPressed, setIsEnterPressed] = useState(false);
   const [currentWord, setCurrentWord] = useState(getNewWord());
 
-  const handleValidateWord = () => {
+  const resetGame = () => {
+    setLetters([]);
+    setCurrentRow(1);
+    setIsEnterPressed(false);
+    setCurrentWord(getNewWord());
+  };
+
+  const checkEnd = useCallback(
+    (currentTryWord) => {
+      if (currentWord === currentTryWord) {
+        alert("Você ganhou!", resetGame());
+      } else if (currentRow === 6) {
+        alert("Você perdeu!");
+      }
+    },
+    [currentRow, currentWord]
+  );
+
+  const handleValidateWord = useCallback(() => {
     const currentTryWords = letters.slice(
       (currentRow - 1) * 5,
       (currentRow - 1) * 5 + 5
@@ -82,55 +101,42 @@ const App = () => {
       alert("Palavra inexistente!");
       setIsEnterPressed(false);
     }
-  };
+  }, [checkEnd, currentRow, currentWord, letters]);
 
-  const checkEnd = (currentTryWord) => {
-    if (currentWord === currentTryWord) {
-      alert("Você ganhou!", resetGame());
-    } else if (currentRow === 6) {
-      alert("Você perdeu!");
-    }
-  };
+  const handleKeyPress = useCallback(
+    (key) => {
+      if (key === "BACKSPACE") {
+        setLetters(letters.slice(0, -1));
+      } else if (key === "ENTER") {
+        handleValidateWord();
+      } else {
+        setLetters([...letters, { letter: key, status: "NOT-VERIFIED" }]);
+        setIsEnterPressed(false);
+        setCurrentRow(Math.floor(letters.length / 5) + 1);
+      }
+    },
+    [letters, handleValidateWord]
+  );
 
-  const resetGame = () => {
-    setLetters([]);
-    setCurrentRow(1);
-    setIsEnterPressed(false);
-    setCurrentWord(getNewWord());
-  };
-
-  const handleKeyPress = (key) => {
-    console.log(key);
-
-    if (key === "BACKSPACE") {
-      setLetters(letters.slice(0, -1));
-    } else if (key === "ENTER") {
-      handleValidateWord();
-    } else {
-      setLetters([...letters, { letter: key, status: "NOT-VERIFIED" }]);
-      setIsEnterPressed(false);
-      setCurrentRow(Math.floor(letters.length / 5) + 1);
-    }
-
-    console.log(letters);
-  };
-
-  const checkIsKeyDisabled = (key) => {
-    if (letters.length >= 30 && isEnterPressed) return true;
-    else if (key === "ENTER" && isEnterPressed) return true;
-    else if (key === "BACKSPACE" && isEnterPressed) return true;
-    else if (
-      letters.length >= currentRow * 5 &&
-      !isEnterPressed &&
-      key !== "ENTER" &&
-      key !== "BACKSPACE"
-    )
-      return true;
-    else if (letters.length < currentRow * 5 && key === "ENTER") return true;
-    else if (letters.length / 5 + 1 === currentRow && key === "BACKSPACE")
-      return true;
-    else return false;
-  };
+  const checkIsKeyDisabled = useCallback(
+    (key) => {
+      if (letters.length >= 30 && isEnterPressed) return true;
+      else if (key === "ENTER" && isEnterPressed) return true;
+      else if (key === "BACKSPACE" && isEnterPressed) return true;
+      else if (
+        letters.length >= currentRow * 5 &&
+        !isEnterPressed &&
+        key !== "ENTER" &&
+        key !== "BACKSPACE"
+      )
+        return true;
+      else if (letters.length < currentRow * 5 && key === "ENTER") return true;
+      else if (letters.length / 5 + 1 === currentRow && key === "BACKSPACE")
+        return true;
+      else return false;
+    },
+    [letters.length, isEnterPressed, currentRow]
+  );
 
   const checkBagroundColor = (letter) => {
     if (letter?.status) {
@@ -147,13 +153,21 @@ const App = () => {
     }
   };
 
+  const handleUserKeyPress = useCallback(
+    (event) => {
+      const key = event.key.toUpperCase();
+      if (keys.includes(key) && !checkIsKeyDisabled(key)) handleKeyPress(key);
+    },
+    [handleKeyPress, checkIsKeyDisabled]
+  );
+
   useEffect(() => {
-    window.addEventListener("keypress", (event) => {
-      const { key } = event;
-      event.stopImmediatePropagation();
-      handleKeyPress(key.toUpperCase());
-    });
-  });
+    window.addEventListener("keydown", handleUserKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleUserKeyPress);
+    };
+  }, [handleUserKeyPress]);
 
   return (
     <>
@@ -194,13 +208,6 @@ const App = () => {
           {key}
         </button>
       ))}
-      <button
-        onClick={() => {
-          resetGame();
-        }}
-      >
-        reset
-      </button>
     </>
   );
 };
