@@ -39,7 +39,7 @@ const emptyLetter = { letter: "", status: "NOT-VERIFIED" };
 
 //NOT-VERIFIED, WRONG-POSITION, RIGHT-POSITION
 
-const word = "AGREE"; //words[parseInt(Math.random() * words.length)].toUpperCase();
+const word = words[parseInt(Math.random() * words.length)].toUpperCase();
 
 const App = () => {
   const [letters, setLetters] = useState([]);
@@ -47,15 +47,23 @@ const App = () => {
   const [isEnterPressed, setIsEnterPressed] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
+  const resetGame = useCallback(() => {
+    setLetters([]);
+    setCurrentRow(1);
+    setIsEnterPressed(false);
+  }, []);
+
   const checkEnd = useCallback(
     (currentTryWord) => {
       if (word === currentTryWord) {
         setFeedbackMessage("Você ganhou!");
+        resetGame();
       } else if (currentRow === 6) {
         setFeedbackMessage("Você perdeu!");
+        resetGame();
       }
     },
-    [currentRow]
+    [currentRow, resetGame]
   );
 
   const handleValidateWord = useCallback(() => {
