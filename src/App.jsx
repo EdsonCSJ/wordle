@@ -39,7 +39,7 @@ const emptyLetter = { letter: "", status: "NOT-VERIFIED" };
 
 //NOT-VERIFIED, WRONG-POSITION, RIGHT-POSITION
 
-const word = "AGREE"; // words[parseInt(Math.random() * words.length)].toUpperCase();
+const word = words[parseInt(Math.random() * words.length)].toUpperCase();
 
 const App = () => {
   const [letters, setLetters] = useState([]);
