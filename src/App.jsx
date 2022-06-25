@@ -39,7 +39,7 @@ const emptyLetter = { letter: "", status: "NOT-VERIFIED" };
 
 //NOT-VERIFIED, WRONG-POSITION, RIGHT-POSITION
 
-const word = words[parseInt(Math.random() * words.length)].toUpperCase();
+const word = "AGREE"; // words[parseInt(Math.random() * words.length)].toUpperCase();
 
 const App = () => {
   const [letters, setLetters] = useState([]);
@@ -48,8 +48,6 @@ const App = () => {
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
   const resetGame = useCallback(() => {
-    setLetters([]);
-    setCurrentRow(1);
     setIsEnterPressed(false);
   }, []);
 
