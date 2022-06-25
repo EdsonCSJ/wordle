@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  background-color: rgb(18, 18, 19);
+  color: white;
+  font-family: "Roboto", sans-serif;
+
+}
+
+#gameMatrix {
+  margin: 0;
+  align-content: center;
+  justify-content: center;
+}
+
+.containers {
+  border: 2px solid #3a3a3c;
+  margin: 2px 2px 0 2px;
+  height: 55px;
+  width: 55px;
+  font-size: 32px;
+}
+
+button {
+  background-color: #818384;
+  border: none;
+  border-radius: 4px;
+  padding: 24px 18px;
+  margin: 2px;
+}
+
+button:hover {
+  cursor: pointer;
+}
