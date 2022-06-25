@@ -47,21 +47,17 @@ const App = () => {
   const [isEnterPressed, setIsEnterPressed] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
 
-  const resetGame = useCallback(() => {
-    setIsEnterPressed(false);
-  }, []);
-
   const checkEnd = useCallback(
     (currentTryWord) => {
       if (word === currentTryWord) {
         setFeedbackMessage("Você ganhou!");
-        resetGame();
+        setIsEnterPressed(false);
       } else if (currentRow === 6) {
         setFeedbackMessage("Você perdeu!");
-        resetGame();
+        setIsEnterPressed(false);
       }
     },
-    [currentRow, resetGame]
+    [currentRow]
   );
 
   const handleValidateWord = useCallback(() => {
